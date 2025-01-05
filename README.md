@@ -1,49 +1,92 @@
-<p align="center">
-  <a href="https://www.gatsbyjs.com/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts">
-    <img alt="Gatsby" src="https://www.gatsbyjs.com/Gatsby-Monogram.svg" width="60" />
-  </a>
-</p>
 <h1 align="center">
-  Gatsby Minimal TypeScript Starter
+  Jack Bergin's Portfolio
 </h1>
 
-## 🚀 Quick start
+<p align="center">
+  A modern, responsive portfolio built with Gatsby, TypeScript, and Tailwind CSS.
+</p>
 
-1.  **Create a Gatsby site.**
+## 🛠️ Tech Stack
 
-    Use the Gatsby CLI to create a new site, specifying the minimal TypeScript starter.
+- **Framework**: [Gatsby](https://www.gatsbyjs.com/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Theme**: Dark/Light mode with system preference detection
 
-    ```shell
-    # create a new Gatsby site using the minimal TypeScript starter
-    npm init gatsby -- -ts
-    ```
+## 📁 Project Structure
 
-2.  **Start developing.**
+```
+portfolio/
+├── src/
+│   ├── components/         # Reusable React components
+│   │   ├── About.tsx      # About section component
+│   │   ├── Layout.tsx     # Main layout wrapper
+│   │   ├── ProjectGrid.tsx # Project display grid
+│   │   └── Skills.tsx     # Skills section component
+│   ├── context/
+│   │   └── ThemeContext.tsx # Dark/light theme management
+│   ├── pages/
+│   │   ├── index.tsx      # Home page
+│   │   └── projects/
+│   │       ├── personal.tsx   # Personal projects page
+│   │       └── professional.tsx # Professional projects page
+│   ├── styles/
+│   │   └── global.css     # Global styles and Tailwind imports
+│   └── types/
+│       └── index.ts       # TypeScript type definitions
+├── gatsby-config.ts       # Gatsby configuration
+├── tailwind.config.js     # Tailwind CSS configuration
+└── tsconfig.json         # TypeScript configuration
+```
 
-    Navigate into your new site’s directory and start it up.
+## 🚀 Getting Started
 
-    ```shell
-    cd my-gatsby-site/
-    npm run develop
-    ```
+1. **Clone the repository**
+```bash
+git clone https://github.com/JackBergin/portfolio.git
+cd portfolio
+```
 
-3.  **Open the code and start customizing!**
+2. **Install dependencies**
+```bash
+npm install
+```
 
-    Your site is now running at http://localhost:8000!
+3. **Start development server**
+```bash
+npm run develop
+```
 
-    Edit `src/pages/index.tsx` to see your site update in real-time!
+Your site will be running at `http://localhost:8000`
 
-4.  **Learn more**
+## 🎨 Features
 
-    - [Documentation](https://www.gatsbyjs.com/docs/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Tutorials](https://www.gatsbyjs.com/docs/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Guides](https://www.gatsbyjs.com/docs/how-to/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [API Reference](https://www.gatsbyjs.com/docs/api-reference/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Plugin Library](https://www.gatsbyjs.com/plugins?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
-    - [Cheat Sheet](https://www.gatsbyjs.com/docs/cheat-sheet/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter-ts)
+- Responsive design that works on all devices
+- Dark/Light mode with system preference detection
+- Interactive project cards with GitHub links
+- Skill categorization with visual hierarchy
+- Smooth transitions and animations
+- SEO optimized
+- TypeScript for type safety
+- Tailwind CSS for styling
 
-## 🚀 Quick start (Netlify)
+## 🔧 Customization
 
-Deploy this starter with one click on [Netlify](https://app.netlify.com/signup):
+1. **Content**: Update the content in the components:
+   - `src/components/About.tsx` for your bio
+   - `src/components/Skills.tsx` for your skills
+   - Project pages for your projects
 
-[<img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" />](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-minimal-ts)
+2. **Styling**: Modify the theme in:
+   - `tailwind.config.js` for color schemes
+   - `src/styles/global.css` for global styles
+
+3. **Layout**: Adjust the layout in:
+   - `src/components/Layout.tsx` for page structure
+   - Individual components for specific sections
+
+## 🤝 Contact
+
+- Email: jack.christopher.bergin@gmail.com
+- LinkedIn: [jackcbergin](https://linkedin.com/in/jackcbergin)
+- GitHub: [JackBergin](https://github.com/JackBergin)
