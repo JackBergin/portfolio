@@ -52,21 +52,21 @@ footer {
 .contact-links {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 2rem; /* Increased spacing between icons */
     flex-wrap: wrap;
 }
 
 .contact-link {
     display: flex;
     align-items: center;
-    color: #67a9ff;
-    text-decoration: none;
-    font-size: 1rem;
-    transition: color 0.3s ease;
+    color: #fff; /* Set text color to white */
+    text-decoration: none; /* Remove underline */
+    font-size: 1.2rem; /* Slightly increased font size for better visibility */
+    transition: transform 0.2s ease, color 0.3s ease; /* Smooth hover effects */
 }
 
 .contact-link i {
-    font-size: 1.5rem;
+    font-size: 1.8rem; /* Increased icon size for better emphasis */
     margin-right: 0.5rem;
 }
 
@@ -74,15 +74,17 @@ footer {
     font-size: 1rem;
 }
 
+/* Hover Effects */
 .contact-link:hover {
-    color: #fff;
+    color: #67a9ff; /* Change color to blue on hover */
+    transform: scale(1.1); /* Slightly enlarge the link on hover */
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .contact-link {
         flex-direction: column;
-        font-size: 0.9rem;
+        font-size: 1rem; /* Adjusted for smaller screens */
     }
 
     .contact-link i {
