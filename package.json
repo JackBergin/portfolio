@@ -10,10 +10,12 @@
   "scripts": {
     "develop": "gatsby develop",
     "start": "gatsby develop",
-    "build": "gatsby build --prefix-paths",
-    "serve": "gatsby serve --prefix-paths",
+    "build": "gatsby build",
+    "build:gh-pages": "gatsby build --prefix-paths",
+    "serve": "gatsby serve",
+    "serve:gh-pages": "gatsby serve --prefix-paths",
     "clean": "gatsby clean",
-    "deploy": "gatsby build --prefix-paths && gh-pages -d public",
+    "deploy": "npm run clean && npm run build:gh-pages && gh-pages -d public",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
