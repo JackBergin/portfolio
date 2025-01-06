@@ -6,13 +6,27 @@ import ProjectGrid from '../../components/ProjectGrid';
 
 const PersonalProjects: React.FC = () => {
   const projects = [
-    // Add your personal projects here
     {
-      title: 'Project 1',
-      description: 'Description of project 1',
-      link: 'https://github.com/yourusername/project1'
+      title: 'EnvoyAI',
+      description: 'A platform for AI agents to interact with each other. They are able to collectively solve problems in a round robin fashion or in a step by step fashion.',
+      link: 'https://github.com/EnvoyAI-Org'
     },
-    // Add more projects...
+    {
+      title: 'Media Newsletter Generator',
+      description: 'Take any subreddit and youtube video, and generate a newsletter.',
+      link: 'https://github.com/JackBergin/newsletter-generation'
+    },
+    {
+      title: 'Horizon AR',
+      description: 'Augmented Reality for marketing and sales. Take a brand to the next level.',
+      link: 'https://github.com/JackBergin/horizon-ar/'
+    },
+    {
+      title: 'LLM Chrome Extension',
+      description: 'A chrome extension that allows you to chat with any website using an LLM.',
+      link: 'https://github.com/JackBergin/llm-chrome-plugin'
+    },
+
   ];
 
   return (

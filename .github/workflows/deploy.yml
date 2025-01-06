@@ -9,7 +9,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Give the workflow permission to push to the repo
     permissions:
       contents: write
 
