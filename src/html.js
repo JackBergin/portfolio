@@ -15,6 +15,16 @@ function HTML(props) {
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="true"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap"
+          rel="stylesheet"
+        />
         {props.headComponents}
       </head>
       <body {...props.bodyAttributes}>

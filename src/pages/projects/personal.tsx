@@ -3,39 +3,29 @@ import { HeadFC } from 'gatsby';
 import { ThemeProvider } from '../../context/ThemeContext';
 import Layout from '../../components/Layout';
 import ProjectGrid from '../../components/ProjectGrid';
+import { personalProjects } from '../../data/portfolio';
 
 const PersonalProjects: React.FC = () => {
-  const projects = [
-    {
-      title: 'EnvoyAI',
-      description: 'A platform for AI agents to interact with each other. They are able to collectively solve problems in a round robin fashion or in a step by step fashion.',
-      link: 'https://github.com/EnvoyAI-Org'
-    },
-    {
-      title: 'Media Newsletter Generator',
-      description: 'Take any subreddit and youtube video, and generate a newsletter.',
-      link: 'https://github.com/JackBergin/newsletter-generation'
-    },
-    {
-      title: 'Horizon AR',
-      description: 'Augmented Reality for marketing and sales. Take a brand to the next level.',
-      link: 'https://github.com/JackBergin/horizon-ar/'
-    },
-    {
-      title: 'LLM Chrome Extension',
-      description: 'A chrome extension that allows you to chat with any website using an LLM.',
-      link: 'https://github.com/JackBergin/llm-chrome-plugin'
-    },
-
-  ];
-
   return (
     <ThemeProvider>
       <Layout>
-        <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8 text-center">Personal Projects</h1>
-          <ProjectGrid projects={projects} />
-        </div>
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+          <p className="kicker text-ink/60 mb-3 rise">Nights & weekends</p>
+          <h1
+            className="font-display text-[clamp(2.4rem,7vw,5rem)] mb-4 rise"
+            style={{ animationDelay: '0.05s' }}
+          >
+            Personal Projects.
+          </h1>
+          <p
+            className="max-w-2xl text-lg text-ink/80 mb-12 rise"
+            style={{ animationDelay: '0.1s' }}
+          >
+            Agentic AI platforms, browser tooling, hardware hacks, and a few
+            academic capstones. Filter by focus, tap a card for detail.
+          </p>
+          <ProjectGrid projects={personalProjects} />
+        </section>
       </Layout>
     </ThemeProvider>
   );
@@ -43,4 +33,4 @@ const PersonalProjects: React.FC = () => {
 
 export default PersonalProjects;
 
-export const Head: HeadFC = () => <title>Personal Projects - Jack Bergin</title>; 
+export const Head: HeadFC = () => <title>Personal Projects — Jack Bergin</title>;

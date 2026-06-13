@@ -1,0 +1,15 @@
+{
+  "hooks": [
+    {
+      "event": "afterFileEdit",
+      "matcher": "**/*.py",
+      "command": ".cursor/hooks/ruff-format.sh",
+      "timeout": 30
+    },
+    {
+      "event": "sessionStart",
+      "command": ".cursor/hooks/session-context.sh",
+      "timeout": 10
+    }
+  ]
+}

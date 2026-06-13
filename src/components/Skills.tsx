@@ -1,69 +1,28 @@
 import React from 'react';
+import { skills } from '../data/portfolio';
 
 const Skills: React.FC = () => {
-  const skillCategories = [
-    {
-      title: "Operating Systems",
-      items: ["Ubuntu", "CentOS", "Windows", "macOS"]
-    },
-    {
-      title: "Languages",
-      items: ["Python", "Java", "JavaScript", "TypeScript", "C++"]
-    },
-    {
-      title: "Web Technologies",
-      items: ["HTML", "CSS", "Tailwind CSS", "REST APIs"]
-    },
-    {
-      title: "Frameworks & Libraries",
-      items: ["React", "Next.js", "Gatsby", "Node.js", "Express"]
-    },
-    {
-      title: "Cloud Computing",
-      items: ["AWS", "GCP", "Azure", "Ngrok"]
-    },
-    {
-      title: "Databases",
-      items: ["MongoDB", "PostgreSQL", "MySQL", "Snowflake"]
-    },
-    {
-      title: "DevOps",
-      items: ["Docker", "Kubernetes", "Proget"]
-    },
-    {
-      title: "Version Control",
-      items: ["Git", "GitLab", "CI/CD Pipelines"]
-    },
-    {
-      title: "Project Management",
-      items: ["Jira", "Agile", "Kanban"]
-    },
-  ];
-
   return (
-    <section className="mb-12">
-      <h2 className="text-3xl font-bold mb-8 text-center">Skills</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {skillCategories.map((category, index) => (
-          <div 
-            key={index}
-            className="bg-gradient-to-r from-light-gradient-1 to-light-gradient-2 
-                     dark:from-dark-gradient-1 dark:to-dark-gradient-2 
-                     rounded-lg p-6 text-white"
-          >
-            <h3 className="text-xl font-bold mb-4 text-center border-b border-white/20 pb-2">
-              {category.title}
-            </h3>
-            <ul className="space-y-2">
-              {category.items.map((item, itemIndex) => (
-                <li 
-                  key={itemIndex}
-                  className="flex items-center before:content-['•'] before:mr-2 before:text-blue-300"
-                >
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
+      <p className="kicker text-ink/60 mb-3">The toolbox</p>
+      <h2 className="font-display text-4xl sm:text-5xl mb-12">Skills.</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {skills.map((group) => (
+          <div key={group.title} className="card flex flex-col gap-4 lift">
+            <div className="flex items-center gap-3">
+              <span
+                className={`shape shape--square fill-${group.accent} w-6 h-6`}
+              />
+              <h3 className="font-display text-xl">{group.title}</h3>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              {group.items.map((item) => (
+                <span key={item} className="chip">
                   {item}
-                </li>
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
         ))}
       </div>
@@ -71,4 +30,4 @@ const Skills: React.FC = () => {
   );
 };
 
-export default Skills; 
+export default Skills;

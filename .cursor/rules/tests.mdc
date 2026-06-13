@@ -1,0 +1,52 @@
+---
+description: Testing conventions for trading-agents
+globs: tests/**/*.py
+alwaysApply: false
+---
+
+# Tests
+
+`pytest-asyncio` runs in `auto` mode (see `pyproject.toml`); just write `async def test_…`.
+
+```bash
+make test                                     # full suite
+uv run pytest tests/agents/ -k scalper -v     # narrow
+uv run pytest -x                              # stop on first failure
+```
+
+## Layout mirrors source
+
+```
+tests/
+  agents/
+    test_threshold_scalper.py
+    test_fixed_dollar_scalper.py
+    test_risk_guards.py
+    test_lot_reconciliation.py
+    test_agent_parsers.py     analyst/broker JSON parsing
+```
+
+A new strategy `your_type` gets `tests/agents/test_your_type.py`. Tests for the cursor-api submodule live inside `submodules/cursor-api/tests/`; run them with `make -C submodules/cursor-api test`.
+
+## Conventions
+
+- **No live network.** Tests for strategies must use synthetic candles built in-test; tests for agents use fake `CursorApiClient`s; tests for the MCP path mock the client. Never call the real Alpaca / trading-mcp / cursor-api in CI.
+- **Cover the fail-closed paths.** For analyst/broker parsers, write a happy-path test AND a malformed-JSON test AND a missing-id test. The fail-closed behaviors are part of the contract.
+- **Cover both halt and filter** in risk-guard tests (kill switch, paper/live gate, daily cap, holdings cap, max notional).
+- **Strategy tests are deterministic.** Same input &rarr; same `Candidate` list. No `random`, no `time.time()` outside fixtures.
+
+## Example pattern
+
+```python
+import pytest
+from trading_agents.strategies.base import StrategyConfig, StrategyContext, MarketState
+from trading_agents.strategies.your_type import YourStrategy
+
+@pytest.mark.asyncio
+async def test_your_strategy_emits_buy_below_threshold():
+    cfg = StrategyConfig(...)
+    market = MarketState(...)
+    ctx = StrategyContext(config=cfg, market=market, open_lots={...})
+    candidates = YourStrategy(cfg).compute_candidates(ctx)
+    assert any(c.action == "BUY" for c in candidates)
+```

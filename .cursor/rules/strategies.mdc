@@ -1,0 +1,57 @@
+---
+description: Conventions for authoring or editing trading strategies
+globs: src/trading_agents/strategies/**/*.py,src/trading_agents/strategies/configs/*.json
+alwaysApply: false
+---
+
+# Strategy authoring rules
+
+Two paths (full recipes in `docs/STRATEGIES.md` — don't restate them here):
+
+1. **JSON-only variant**: a new config with `"type": "rule_based"`. Prefer this whenever the signal is "indicator vs. threshold" entry + exits from the shared rule library. Zero Python.
+2. **Plugin strategy**: a `Strategy` subclass + one or more JSON configs in `strategies/configs/`.
+
+## Required shape for a plugin strategy
+
+```python
+from pydantic import BaseModel, ConfigDict
+
+from .base import Candidate, EntryContext, Strategy
+from .exits import ExitPolicy, StopLossConfig, stop_loss_rules
+from .loader import default_registry
+
+class YourParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")  # typo'd config keys fail at boot
+    ...
+
+@default_registry.register
+class YourStrategy(Strategy):
+    type_name = "your_type"
+    params_model = YourParams
+
+    def exit_policy(self, params: YourParams) -> ExitPolicy: ...
+    def entry_signal(self, ec: EntryContext) -> tuple[Candidate | None, str | None]: ...
+```
+
+The base class owns the per-symbol loop (price extraction, exit evaluation through the shared evaluator, holdings gating, logging). Override `data_requirements()` for non-default candle lookback / trade flow; override `compute_candidates()` only as the escape hatch for shapes the template can't express — and route exits through `exits.evaluate_exits` so the never-sell-at-a-loss gate still applies.
+
+Then in `strategies/loader.py::register_builtin_strategies()` add:
+
+```python
+from . import your_type  # noqa: F401
+```
+
+and drop a JSON config in `strategies/configs/your_type_v1.json` with `"type": "your_type"`, a unique `"id"`, and `"exit": {"stop_loss": {"enabled": false}}`.
+
+## Authoring guidelines
+
+- **Determinism.** No randomness, no I/O outside `ctx.market`. The analyst must be able to re-derive your reasoning from `rationale`.
+- **Always set `Candidate.rationale`.** A short, human-readable string that gets surfaced to the analyst and broker prompts.
+- **Use `ctx.open_lots[symbol]`** for entry prices, not Alpaca's `avg_entry_price`.
+- **Degrade to no-op, never to BUY/SELL.** On a missing price the base template skips the symbol with a log line and **no candidate rows (not even HOLD)** — emitting HOLDs would change decision-row volume and the orchestrator's analyst-skip condition. Missing indicator data → `entry_signal` returns `(None, "skip_reason")`. Never crash a tick; never guess a price.
+- **Respect `ctx.config.constraints`.** Compute notional against `max_notional_per_trade_usd`; don't propose a BUY if `len(open_lots) >= max_holdings_per_symbol`.
+- **Keep starter JSON configs conservative.** `mode: "paper"`, tight `max_notional_per_trade_usd`, small `daily_max_trades`. Operators raise these later.
+
+## Tests
+
+Mirror an existing test in `tests/agents/test_<your_type>.py` using synthetic candle data – never hit the live MCP in tests.

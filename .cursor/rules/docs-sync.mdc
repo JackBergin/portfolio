@@ -1,0 +1,32 @@
+---
+description: Keeping docs and .env.example in sync with code
+alwaysApply: true
+---
+
+# Docs and .env.example must stay in sync
+
+When you make a change, update the matching docs in the same PR. The doc set is small on purpose; treating it as canonical keeps onboarding fast.
+
+| Change | Update |
+|--------|--------|
+| Bump the cursor-api submodule pin | mention the SHA in the commit message; review breaking changes in `submodules/cursor-api/` against the orchestrator's `cursor_client.py` |
+| Add / change a `CURSOR_API_*` env var (i.e. you also bumped the cursor-api submodule) | `submodules/cursor-api/.env.example` (upstream), and `.env.example` in this repo if `make headless-deploy` needs it |
+| Add / change a `TRADING_AGENTS_*` env var | `src/trading_agents/config.py`, `docs/AGENTS.md` Configuration table, `.env.example` |
+| Add / change a strategy schema field | `src/trading_agents/strategies/schema.json`, `docs/STRATEGIES.md` |
+| Add a new built-in strategy | `docs/STRATEGIES.md` (Built-in Strategies), `README.md` (table), and a test in `tests/agents/` |
+| Add or alter a ledger table | add `migrations/NNN_<table>.{up,down}.sql`, update the table list in `docs/AGENTS.md` Ledger section |
+| Add a new `make` target | `.PHONY` line, `make help` block, `docs/DEVELOP.md` cheat-sheet (and `README.md` if it's user-facing) |
+| Add a file the headless deploy / dev loop writes to repo root | `.gitignore` |
+
+## .env.example rules
+
+- Mirror layout of `.env`: same section comments, same ordering.
+- Use placeholder values for anything secret (`# CURSOR_API_KEY=your-cursor-api-key` commented out).
+- Inline a one-line warning on dangerous knobs (e.g. `TRADING_AGENTS_ALLOW_LIVE`).
+- `.env` is gitignored; `.env.example` is checked in.
+
+## Doc style
+
+- Tables over prose where possible. Mermaid diagrams over ASCII when a flow has more than ~3 steps.
+- Link to source files with relative paths from the doc, e.g. `[orchestrator.py](../src/trading_agents/orchestrator.py)`.
+- Don't duplicate prose between `README.md` and `docs/`. The README points at docs; docs hold the depth.

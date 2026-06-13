@@ -1,0 +1,50 @@
+---
+description: Rules for orchestrator, analyst, broker, and risk-guard changes
+globs: src/trading_agents/orchestrator.py,src/trading_agents/agents/**/*.py,src/trading_agents/risk/**/*.py
+alwaysApply: false
+---
+
+# Orchestrator / Agents / Risk
+
+The orchestrator is the spine of one tick. Read `orchestrator.py` end to end before touching it. The full per-tick sequence is documented in `docs/ARCHITECTURE.md` and `docs/AGENTS.md`.
+
+## Layer contracts (do not blur)
+
+```
+strategy.compute_candidates  → deterministic Python
+RiskGuard.evaluate           → deterministic Python (halt or filter)
+AnalystAgent.review          → cursor-api ask, approve_mcps=false
+BrokerAgent.execute          → cursor-api agent, approve_mcps=true
+```
+
+- New hard caps go in `risk/guards.py`, **not** in strategies, **not** in the analyst prompt.
+- New "thinking" goes in the strategy, **not** in the analyst prompt.
+- The broker only ever receives the analyst-approved actionable decisions. Don't widen its input.
+
+## Analyst rules
+
+- Cursor mode: `ask`. `approve_mcps=false`. Never change these.
+- Required output is a single trailing JSON object: `{"approved": [...], "rejected": [...], "notes": "..."}`.
+- Parser must continue to:
+  - Drop ids the model invented.
+  - Auto-reject ids the model omitted (fail closed).
+  - Strip HOLDs out of `approved`.
+  - Treat unparseable output as "reject everything".
+
+## Broker rules
+
+- Cursor mode: `agent`. `approve_mcps=true`, `trust=true`, `force=true`.
+- Skip the broker entirely if no actionable decisions remain.
+- Required output is a single trailing JSON object with an `executions` array.
+- Decisions the model omits must be recorded as `status="failed"` with `"Broker omitted execution result"`.
+- The broker prompt forbids `close_all_positions` and `cancel_all_orders`; keep that ban when editing the template.
+
+## Ledger writes
+
+Every tick must:
+
+1. Insert one `TickRow` (`status=running`) up front.
+2. Insert all `DecisionRow`s (including HOLDs and risk-rejected ones) so the audit is complete.
+3. Insert one `AnalysisRow` per analyst call.
+4. Insert one `ExecutionRow` per attempted broker decision; insert a `LotRow` only on a successful BUY; close a `LotRow` only on a successful SELL.
+5. Finalize the `TickRow` (`status=ok` or `error`) in a `finally` block.

@@ -1,0 +1,1 @@
+Implement the plan as specified cleanly, concisely, and elegantly. Modify only the files explicitly listed in the plan, and make no other refactors, cleanup, formatting-only edits, or dependency changes outside that scope.

@@ -1,3 +1,258 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================================
+   Bold & Playful Paper — design tokens
+   ============================================================ */
+:root {
+  /* Surfaces & ink — stored as raw RGB channels so Tailwind opacity
+     modifiers (text-ink/60, bg-bg/85, …) work, and composed into full
+     color vars for use in plain CSS (borders, shadows, fills). */
+  --bg-rgb: 247 244 236; /* warm paper — page background */
+  --panel-rgb: 239 234 224; /* muted panel / placeholder fills */
+  --card-rgb: 255 253 248; /* near-white card surface */
+  --ink-rgb: 32 29 24; /* near-black — text, borders, shadows */
+  --a1-rgb: 226 92 51; /* coral  */
+  --a2-rgb: 61 95 208; /* cobalt */
+  --a3-rgb: 46 158 91; /* green  */
+  --a4-rgb: 239 201 63; /* yellow */
+
+  --bg: rgb(var(--bg-rgb));
+  --panel: rgb(var(--panel-rgb));
+  --card: rgb(var(--card-rgb));
+  --ink: rgb(var(--ink-rgb));
+  --a1: rgb(var(--a1-rgb));
+  --a2: rgb(var(--a2-rgb));
+  --a3: rgb(var(--a3-rgb));
+  --a4: rgb(var(--a4-rgb));
+
+  /* Structure */
+  --border: 4px solid var(--ink);
+  --shadow: 10px 10px 0 var(--ink);
+  --radius-card: 24px;
+  --radius-pill: 999px;
+}
+
+/* Midnight variant — same bold energy, inverted surfaces.
+   Ink becomes light, so borders/shadows read as light strokes on dark. */
+.dark {
+  --bg-rgb: 26 22 17;
+  --panel-rgb: 36 31 24;
+  --card-rgb: 42 36 28;
+  --ink-rgb: 247 244 236;
+  --a1-rgb: 255 111 68;
+  --a2-rgb: 108 140 255;
+  --a3-rgb: 70 194 121;
+  --a4-rgb: 246 210 79;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Archivo', sans-serif;
+  font-weight: 500;
+  line-height: 1.3;
+  text-wrap: pretty;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: var(--a4);
+  color: var(--ink);
+}
+
+/* Paper grain / dotted texture for warmth */
+.paper-grid {
+  background-image: radial-gradient(
+    var(--ink) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 22px 22px;
+  background-position: -11px -11px;
+  opacity: 0.06;
+}
+
+/* ============================================================
+   Typography helpers
+   ============================================================ */
+.font-display {
+  font-family: 'Archivo Black', sans-serif;
+  letter-spacing: -1px;
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+
+.kicker {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+}
+
+/* ============================================================
+   Components
+   ============================================================ */
+.card {
+  background: var(--card);
+  border: var(--border);
+  border-radius: var(--radius-card);
+  padding: 32px;
+}
+
+.card--shadow {
+  box-shadow: var(--shadow);
+}
+
+/* Lift + press interactions */
+.lift {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.lift:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow);
+}
+.lift:active {
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border: var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+  cursor: default;
+  transition: transform 0.1s ease, background-color 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.chip--btn {
+  cursor: pointer;
+}
+.chip--btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.chip--active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: var(--border);
+  border-radius: 12px;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 14px 26px;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.btn:hover {
+  box-shadow: var(--shadow);
+}
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+.btn--ghost {
+  background: var(--card);
+  color: var(--ink);
+}
+
+/* Decorative shapes */
+.shape {
+  border: var(--border);
+}
+.shape--circle {
+  border-radius: 50%;
+}
+.shape--pill {
+  border-radius: 999px;
+}
+.shape--square {
+  border-radius: 36px;
+}
+
+/* Accent fills */
+.fill-a1 { background: var(--a1); }
+.fill-a2 { background: var(--a2); }
+.fill-a3 { background: var(--a3); }
+.fill-a4 { background: var(--a4); }
+
+/* Nav links */
+.nav-link {
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.15s ease;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 3px;
+  background: var(--a1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.nav-link:hover::after,
+.nav-link--active::after {
+  transform: scaleX(1);
+}
+
+/* ============================================================
+   Motion
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.5s ease-out both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

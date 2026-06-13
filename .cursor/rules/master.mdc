@@ -1,0 +1,139 @@
+---
+description: Master rule — project overview, hard invariants, clarification protocol, and chat interaction guidelines
+alwaysApply: true
+---
+
+# trading-agents — master rule
+
+This is the single always-applied rule that governs both the project itself and
+how the assistant should interact with the user. It supersedes the previous
+`project-overview.mdc`. The doc set, hard invariants, environment conventions,
+the *clarification protocol*, and the *chat interaction guidelines* all live
+here.
+
+## Project overview
+
+Scheduled trading orchestrator. Single Python package (`src/trading_agents/`);
+two upstream services are vendored as git submodules.
+
+- `src/trading_agents/` — Scheduler + Analyst/Broker dispatch + ledger + risk
+  guards. Calls `cursor-api` for the Analyst (`mode=ask`) and Broker
+  (`mode=agent`, `approve_mcps=true`) and reads the trading MCP server
+  (`http://127.0.0.1:9230/mcp`).
+- `submodules/cursor-api/` — FastAPI wrapper around the local Cursor `agent`
+  CLI. **Actively co-developed from this repo** (see invariant 7 below).
+- `submodules/trading-mcp/` — Streamable HTTP MCP server. Fronts Alpaca for
+  execution and Massive (formerly Polygon.io) for market data.
+
+## Read these first
+
+- `docs/ARCHITECTURE.md` — topology, per-tick flow, layered responsibilities.
+- `docs/AGENTS.md` — orchestrator, analyst/broker contracts, ledger.
+- `docs/STRATEGIES.md` — strategy JSON schema + how to add one.
+- `docs/DEVELOP.md` — dev loop, conventions, debugging.
+- `docs/HOOKS.md` — Cursor hooks primer for this repo.
+- `.cursor/README.md` — map of `.cursor/` subdirectories (agents, skills,
+  hooks, commands, rules, plans).
+
+## Four processes
+
+| Port | Service | Source |
+|------|---------|--------|
+| 5432 | `postgres` | Docker (`docker-compose.yml`) |
+| 9230 | `trading-mcp` | `submodules/trading-mcp/` (Docker) |
+| 8000 | `cursor-api` | `submodules/cursor-api/` (host process; needs OS keyring auth) |
+| 8100 | `trading-agents` | `src/trading_agents/` (Docker) |
+
+`cursor-api` runs as a host process because the Cursor `agent` binary's
+authentication depends on the host OS keyring; containers can't reach it.
+`trading-agents` reaches it via `host.docker.internal`.
+
+## Hard invariants — do not violate
+
+1. **Analyst never executes.** `mode=ask`, `approve_mcps=false`. Even if the
+   prompt is jailbroken, cursor-api refuses MCP execution.
+2. **Broker never strategizes.** It only processes the analyst-approved
+   subset. Its prompt is mechanical.
+3. **Strategies are deterministic Python.** All "thinking" happens in
+   `compute_candidates`. The analyst sanity-checks; it does not invent trades.
+4. **Fail closed on the LLM side.** Unparseable analyst output rejects every
+   candidate; unparseable broker output marks every approved decision `failed`.
+5. **Ledger is the source of truth for entry prices.** Use `ctx.open_lots`,
+   never Alpaca's aggregated `avg_entry_price`.
+6. **Starter configs ship `mode: "paper"`.** Live mode requires both
+   `mode: "live"` in the JSON and `TRADING_AGENTS_ALLOW_LIVE=true` in env.
+7. **Submodules are actively co-developed.** Edits to `submodules/cursor-api/`
+   and `submodules/trading-mcp/` from this repo are expected. Commits to those
+   submodules should still be made within the submodule itself (`git -C
+   submodules/<name> commit`); the parent repo just bumps the pin.
+
+## Environment
+
+- Python 3.11+, async-first (`httpx.AsyncClient`, `asyncpg`, `mcp`).
+- `from __future__ import annotations` at the top of every new module.
+- All settings via `pydantic-settings`. The relevant prefix here is
+  `TRADING_AGENTS_*`; the cursor-api submodule owns `CURSOR_API_*`. Keep
+  `.env.example` in sync when you add a setting.
+- Use `uv` for everything: `uv sync --extra dev`, `uv run pytest`,
+  `uv run trading-agents`. Docker images use `uv build` to produce a wheel
+  and install **only** the wheel into the runtime layer.
+- Formatting: `ruff format` + `ruff check --fix`. The `afterFileEdit` hook
+  applies these automatically on `*.py` saves.
+
+---
+
+## Clarification protocol — REQUIRED for non-trivial work
+
+Before starting any implementation, the assistant **must** ask the user
+interviewer-style clarifying questions when **any** of the following is true:
+
+- The change touches **more than 2 files**.
+- A **new dependency** is added to a `pyproject.toml` or `package.json`.
+- The change modifies **infrastructure**: any of `Dockerfile`,
+  `docker-compose.yml`, `Makefile`, `migrations/`, `scripts/migrate.py`, or
+  `.cursor/hooks*`.
+- The change is **architectural**: new module, new service, schema change,
+  new agent/skill/hook, or alters an existing hard invariant.
+
+When the protocol fires:
+
+1. List the assumptions you would otherwise make.
+2. Ask focused, numbered questions to remove each assumption.
+3. After answers, write a plan to `.cursor/plans/<YYYY-MM-DD>-<slug>.plan.md`.
+   The `.plan.md` suffix is required — Cursor uses it to expose the file as a
+   selectable target when picking the model that will implement the plan.
+4. Request explicit sign-off before executing.
+
+Trivial fixes (typos, single-file bug fixes, log message tweaks, comment
+edits) bypass this protocol — proceed directly.
+
+---
+
+## Chat interaction guidelines
+
+How the assistant should behave in this repo:
+
+- **Always do the clarification protocol** when the trigger fires above. Don't
+  guess at what the user wants for a non-trivial change.
+- **Run the preflight check** (`.cursor/commands/preflight.md`) before
+  scaffolding new infrastructure or making large changes. Score yourself 0-100
+  on confidence and surface what's underspecified.
+- **Show the plan first.** For agentic infrastructure or anything triggered by
+  the clarification protocol, write the plan to `.cursor/plans/` and request
+  sign-off before any code changes.
+- **No Cursor attribution in commits or PRs.** Never add lines like *"🤖
+  Generated with Cursor"* or *"Co-authored-by: Cursor"* to commit messages or
+  PR descriptions. Use the local OS git identity as-is.
+- **Reference commands by path.** When an agent or skill needs the user to
+  follow a specific procedure (commit format, code review checklist), link to
+  the canonical file: `.cursor/commands/<name>.md`. Don't restate.
+- **Hooks enforce; rules guide.** Behaviors that need deterministic
+  enforcement (formatting, context injection, data-loss guardrails) live in
+  `.cursor/hooks/`. Behaviors that benefit from LLM judgment (style,
+  architecture, naming) live in `.cursor/rules/` or agent prompts.
+- **Subagents have specialties.** Route work to the right one:
+  `.cursor/agents/coder.md` for Python implementation,
+  `.cursor/agents/infrastructure.md` for Docker / Makefile / migrations,
+  `.cursor/agents/testing.md` for pytest, `.cursor/agents/docs.md` for
+  documentation, `.cursor/agents/review.md` (readonly) for architectural
+  review.

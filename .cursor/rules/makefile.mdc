@@ -1,0 +1,52 @@
+---
+description: Makefile conventions for trading-agents
+globs: Makefile
+alwaysApply: false
+---
+
+# Makefile
+
+The Makefile is the single entrypoint for every common task. New targets MUST:
+
+1. **Be added to the top `.PHONY` line.** Forgetting this is the most common bug here.
+2. **Have a one-line description in the `help` block** under the appropriate section header (`trading-agents targets:`, `Submodule targets:`, `Headless deploy targets:`).
+3. **Use `?=` for any operator-tunable variable** so it can be overridden on the command line: `make foo PORT=9000`.
+4. **Quote variable expansions** in shell snippets: `"$(WORKSPACE)"`, not `$(WORKSPACE)` &ndash; workspaces commonly contain spaces.
+5. **Echo the actual values** with `$(MAKE) help` so operators can confirm overrides took effect.
+
+## Existing variable conventions
+
+| Var | Meaning |
+|-----|---------|
+| `HOST`, `PORT`, `BASE_URL` | cursor-api bind + curl base (forwarded into the submodule) |
+| `MODEL` | default Cursor model passed to `/prompt` |
+| `WORKSPACE` | the workspace cursor-api allowlists / scopes runs to |
+| `CURSOR_API_DIR` | path to the cursor-api submodule (default: `submodules/cursor-api`) |
+| `AGENTS_HOST`, `AGENTS_PORT`, `AGENTS_BASE_URL` | trading-agents status API |
+| `AGENTS_LEDGER`, `AGENTS_KILL` | SQLite + kill-switch paths |
+| `AGENTS_CURSOR_API_URL`, `AGENTS_TRADING_MCP_URL` | upstream URLs trading-agents calls |
+| `AGENTS_STRATEGY` | optional single-strategy filter for `agents-tick` |
+| `AGENTS_STRATEGIES` | comma-separated list passed to `trading-agents serve --strategies` (default: `fixed_dollar_scalper_v1`) |
+
+## Submodule wrappers
+
+Targets that operate on a submodule MUST go through `make -C $(CURSOR_API_DIR) <target>`, not by re-implementing the submodule's recipe here. Forwarding HOST / PORT / WORKSPACE etc. via env keeps both Makefiles single-source-of-truth.
+
+## Headless / background targets
+
+For targets that background long-running processes (e.g. `headless-deploy`), put the actual logic in `scripts/<name>.sh` and have the Make target just forward env vars and `bash scripts/<name>.sh`. Keep the script `set -euo pipefail` and use `setsid` so the recorded PID is also a process-group id.
+
+## Example: adding a new target
+
+```makefile
+.PHONY: ... my-new-target
+...
+
+	@echo "  make my-new-target  One-line description"
+
+my-new-target:
+	HOST="$(HOST)" PORT="$(PORT)" \
+	bash scripts/my_new_target.sh
+```
+
+That's it: phony, help line, env-passing recipe.

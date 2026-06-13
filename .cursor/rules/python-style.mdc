@@ -1,0 +1,50 @@
+---
+description: Python style and async conventions for this codebase
+globs: **/*.py
+alwaysApply: false
+---
+
+# Python style
+
+- **Python 3.11+, async-first.** This codebase uses `httpx.AsyncClient`, `asyncpg`, `mcp`, and FastAPI; new I/O paths should be `async def`.
+- **Formatting and linting via `ruff`.** `ruff format` is the formatter; `ruff check --fix` is the linter. The `afterFileEdit` hook (`.cursor/hooks/ruff-format.sh`) applies both automatically on save. Configuration lives in each repo's `pyproject.toml` under `[tool.ruff]`.
+- **`from __future__ import annotations`** at the top of every new module. We use modern type syntax (`X | None`, `list[Foo]`) everywhere.
+- **Type-annotate public surface.** Function signatures, dataclass fields, pydantic models. Loose `Any` is fine inside private helpers; not at boundaries.
+- **Pydantic for boundary types.** Cursor-api request/response, ledger rows, strategy configs (`StrategyConfig`). Do not pass raw dicts across module boundaries.
+- **Settings via `pydantic-settings`.** This package's prefix is `TRADING_AGENTS_*`; the cursor-api submodule owns its own `CURSOR_API_*` settings. New env vars in this repo must be:
+  1. Added to `trading_agents.config.Settings` with a `Field(default=...)`.
+  2. Documented in `docs/AGENTS.md` (Configuration table).
+  3. Added to `.env.example` with a short comment.
+
+## Imports
+
+Order: stdlib → third-party → first-party. Inside first-party, prefer absolute imports for clarity (`from trading_agents.ledger.models import LotRow`), except inside the package itself where relative imports (`from ..ledger.models import LotRow`) match the existing code.
+
+## Error handling
+
+```python
+# ❌ BAD — silently swallows
+try:
+    await client.get_snapshot(symbol)
+except Exception:
+    pass
+
+# ✅ GOOD — degrade explicitly, log at the call site
+try:
+    snap = await client.get_snapshot(symbol)
+except Exception as exc:
+    logger.warning("snapshot failed symbol=%s err=%s", symbol, exc)
+    snap = None
+```
+
+A single bad symbol must never kill a tick (see `orchestrator.py` for the pattern).
+
+## Logging
+
+- Use `logger = logging.getLogger(__name__)` at module top.
+- Keys-and-values format: `logger.info("tick symbol=%s price=%s reason=%s", sym, price, reason)`.
+- Don't `print()` from production code paths; reserve it for `trading-agents tick` which is meant to print JSON to stdout.
+
+## Comments
+
+Don't narrate what the code is doing. Only explain non-obvious *why* (trade-offs, fail-closed reasoning, MCP quirks).
