@@ -11,7 +11,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
   return (
     <article
-      className={`card lift relative overflow-hidden flex flex-col gap-4 ${
+      className={`card lift relative overflow-hidden flex flex-col gap-4 h-full ${
         project.featured ? 'card--shadow' : ''
       }`}
     >

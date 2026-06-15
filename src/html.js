@@ -1,5 +1,11 @@
 import React from "react"
 import PropTypes from "prop-types"
+import { withPrefix } from "gatsby"
+
+// Runs before first paint: adds a `js` class (so reveal animations only hide
+// content when JS is available) and applies the saved/system theme so dark
+// mode never flashes on load.
+const themeInit = `(function(){try{var e=document.documentElement;e.classList.add('js');var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){e.classList.add('dark')}}catch(_){}})();`
 
 function HTML(props) {
   return (
@@ -11,6 +17,14 @@ function HTML(props) {
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
+        <meta name="theme-color" content="#E25C33" />
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          href={withPrefix("/favicon.svg")}
+        />
+        <link rel="apple-touch-icon" href={withPrefix("/favicon.svg")} />
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"

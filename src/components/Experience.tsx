@@ -1,16 +1,21 @@
 import React from 'react';
 import { experience } from '../data/portfolio';
+import Reveal from './Reveal';
 
 const Experience: React.FC = () => {
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-      <p className="kicker text-ink/60 mb-3">Where I&apos;ve worked</p>
-      <h2 className="font-display text-4xl sm:text-5xl mb-12">Experience.</h2>
+      <Reveal>
+        <p className="kicker text-ink/60 mb-3">Where I&apos;ve worked</p>
+        <h2 className="font-display text-4xl sm:text-5xl mb-12">Experience.</h2>
+      </Reveal>
 
       <div className="flex flex-col gap-6">
-        {experience.map((role) => (
-          <article
+        {experience.map((role, i) => (
+          <Reveal
+            as="article"
             key={`${role.company}-${role.period}`}
+            delay={i * 80}
             className="card relative overflow-hidden lift"
           >
             {/* accent strip down the left edge */}
@@ -39,7 +44,7 @@ const Experience: React.FC = () => {
                 ))}
               </ul>
             </div>
-          </article>
+          </Reveal>
         ))}
       </div>
     </section>

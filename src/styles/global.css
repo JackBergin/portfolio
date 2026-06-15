@@ -233,6 +233,83 @@ body {
 }
 
 /* ============================================================
+   JB monogram (header logo + favicon parity)
+   ============================================================ */
+.monogram {
+  display: block;
+  overflow: visible;
+}
+.monogram__plate {
+  fill: var(--a1);
+  stroke: var(--ink);
+  stroke-width: 4;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+    fill 0.25s ease;
+}
+.monogram__text {
+  fill: #fffdf8;
+  font-family: 'Archivo Black', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -1.5px;
+}
+.group:hover .monogram__plate {
+  transform: rotate(-5deg) scale(1.04);
+}
+.group:active .monogram__plate {
+  transform: rotate(-2deg) scale(0.96);
+}
+
+/* ============================================================
+   Scroll progress bar
+   ============================================================ */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: linear-gradient(
+    90deg,
+    var(--a1),
+    var(--a4),
+    var(--a3),
+    var(--a2)
+  );
+  z-index: 50;
+  will-change: transform;
+}
+
+/* ============================================================
+   Hero: drifting aurora glow + pointer parallax
+   ============================================================ */
+.aurora {
+  position: absolute;
+  inset: -25% -10% auto -10%;
+  height: 150%;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(64px);
+  opacity: 0.55;
+  background:
+    radial-gradient(40% 50% at 20% 30%, rgb(var(--a1-rgb) / 0.5), transparent 70%),
+    radial-gradient(40% 50% at 80% 20%, rgb(var(--a2-rgb) / 0.45), transparent 70%),
+    radial-gradient(45% 55% at 60% 85%, rgb(var(--a3-rgb) / 0.4), transparent 70%);
+}
+.dark .aurora {
+  opacity: 0.4;
+}
+
+.parallax {
+  transform: translate3d(var(--px, 0), var(--py, 0), 0);
+  transition: transform 0.2s ease-out;
+}
+
+/* ============================================================
    Motion
    ============================================================ */
 @media (prefers-reduced-motion: no-preference) {
@@ -249,10 +326,48 @@ body {
       transform: none;
     }
   }
+
+  .aurora {
+    animation: aurora 18s ease-in-out infinite alternate;
+  }
+  @keyframes aurora {
+    0% {
+      transform: translate3d(-4%, -2%, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(4%, 3%, 0) scale(1.1);
+    }
+    100% {
+      transform: translate3d(-2%, 4%, 0) scale(1.05);
+    }
+  }
+}
+
+/* Scroll-reveal — only hides content when JS is available (the `js` class is
+   set by the inline init in html.js), so no-JS visitors still see everything. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.js .reveal--in {
+  opacity: 1;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .group:hover .monogram__plate,
+  .group:active .monogram__plate {
+    transform: none;
+  }
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

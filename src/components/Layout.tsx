@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 import { Link } from 'gatsby';
 import { useTheme } from '../context/ThemeContext';
 import { about, contact } from '../data/portfolio';
+import Monogram from './Monogram';
+import ScrollProgress from './ScrollProgress';
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,15 +20,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg text-ink">
+      <ScrollProgress />
+
       {/* subtle paper texture behind everything */}
       <div className="paper-grid fixed inset-0 -z-10 pointer-events-none" />
 
       <header className="sticky top-0 z-30 bg-bg/85 backdrop-blur border-b-4 border-ink">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-3 group">
-            <span className="shape shape--square fill-a1 w-10 h-10 flex items-center justify-center font-display text-bg text-lg">
-              JB
-            </span>
+            <Monogram className="w-10 h-10 shrink-0" />
             <span className="font-display text-lg sm:text-xl hidden sm:inline">
               {about.name}
             </span>

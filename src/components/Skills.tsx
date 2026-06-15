@@ -1,15 +1,22 @@
 import React from 'react';
 import { skills } from '../data/portfolio';
+import Reveal from './Reveal';
 
 const Skills: React.FC = () => {
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-      <p className="kicker text-ink/60 mb-3">The toolbox</p>
-      <h2 className="font-display text-4xl sm:text-5xl mb-12">Skills.</h2>
+      <Reveal>
+        <p className="kicker text-ink/60 mb-3">The toolbox</p>
+        <h2 className="font-display text-4xl sm:text-5xl mb-12">Skills.</h2>
+      </Reveal>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {skills.map((group) => (
-          <div key={group.title} className="card flex flex-col gap-4 lift">
+        {skills.map((group, i) => (
+          <Reveal
+            key={group.title}
+            delay={i * 90}
+            className="card flex flex-col gap-4 lift"
+          >
             <div className="flex items-center gap-3">
               <span
                 className={`shape shape--square fill-${group.accent} w-6 h-6`}
@@ -23,7 +30,7 @@ const Skills: React.FC = () => {
                 </span>
               ))}
             </div>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>

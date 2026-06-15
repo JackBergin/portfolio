@@ -1,12 +1,48 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'gatsby';
 import { about, contact } from '../data/portfolio';
 
 const Hero: React.FC = () => {
+  const parallaxRef = useRef<HTMLDivElement | null>(null);
+
+  // Subtle pointer parallax on the floating shapes. Skipped for users who
+  // prefer reduced motion and on touch / no-pointer devices.
+  useEffect(() => {
+    const layer = parallaxRef.current;
+    if (!layer) return;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fine = window.matchMedia('(pointer: fine)').matches;
+    if (reduce || !fine) return;
+
+    let frame = 0;
+    const onMove = (e: MouseEvent) => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 2;
+        const y = (e.clientY / window.innerHeight - 0.5) * 2;
+        layer.style.setProperty('--px', `${x * 18}px`);
+        layer.style.setProperty('--py', `${y * 18}px`);
+      });
+    };
+
+    window.addEventListener('mousemove', onMove);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
     <section className="relative overflow-hidden border-b-4 border-ink">
+      {/* slow-drifting color glow */}
+      <div className="aurora" aria-hidden />
+
       {/* Floating decorative shapes bleeding off the edges */}
-      <div className="pointer-events-none absolute inset-0 -z-0">
+      <div
+        ref={parallaxRef}
+        className="parallax pointer-events-none absolute inset-0 -z-0"
+      >
         <div className="shape shape--circle fill-a2 w-40 h-40 absolute -top-12 -right-10 opacity-90 animate-float" />
         <div
           className="shape shape--square fill-a4 w-28 h-28 absolute top-40 -left-10 animate-float"
